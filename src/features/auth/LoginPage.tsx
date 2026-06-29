@@ -1,7 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/app/auth-context";
 import * as styles from "./LoginPage.css";
+
+/** Mantém a tela de entrada sempre no tema claro, sem alterar a preferência salva. */
+function useForceLight() {
+  useEffect(() => {
+    const root = document.documentElement;
+    const previous = root.dataset.theme;
+    root.dataset.theme = "light";
+    return () => {
+      if (previous) root.dataset.theme = previous;
+    };
+  }, []);
+}
 
 function GoogleMark() {
   return (
@@ -33,6 +45,7 @@ const ERROR_COPY: Record<string, string> = {
 };
 
 export function LoginPage() {
+  useForceLight();
   const { signInWithGoogle } = useAuth();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +83,7 @@ export function LoginPage() {
 }
 
 export function NoAccessPage() {
+  useForceLight();
   const { user, signOut } = useAuth();
   return (
     <div className={styles.page}>
