@@ -6,6 +6,7 @@ import {
   type User,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
+import { useClientsStore } from "@/features/clients/store";
 import { AuthContext } from "./auth-context";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -24,6 +25,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
+    // Limpa qualquer dado em memória antes de sair, para a próxima conta
+    // nunca enxergar resquício da anterior na mesma aba.
+    useClientsStore.getState().reset();
     await fbSignOut(auth);
   }
 

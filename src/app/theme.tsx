@@ -1,30 +1,20 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { ThemeContext, type Theme } from "./theme-context";
+import { useCallback, useEffect, type ReactNode } from "react";
+import { ThemeContext } from "./theme-context";
 
-const STORAGE_KEY = "oubble-theme";
-
-function resolveInitialTheme(): Theme {
-  if (typeof window === "undefined") return "light";
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark") return stored;
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  return prefersDark ? "dark" : "light";
-}
-
+/**
+ * Dark mode desabilitado por enquanto: o app fica fixo no tema claro e o
+ * toggle é um no-op. Para reativar, basta voltar a guardar o tema em estado
+ * + localStorage e respeitar prefers-color-scheme.
+ */
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(resolveInitialTheme);
-
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
-
-  const toggle = useCallback(() => {
-    setTheme((current) => (current === "light" ? "dark" : "light"));
+    document.documentElement.dataset.theme = "light";
   }, []);
 
+  const toggle = useCallback(() => {}, []);
+
   return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
+    <ThemeContext.Provider value={{ theme: "light", toggle }}>
       {children}
     </ThemeContext.Provider>
   );

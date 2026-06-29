@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { Icon } from "@/components/Icon";
 import { LogoMark } from "@/components/LogoMark";
-import { useTheme } from "@/app/theme-context";
+
 import { useAuth } from "@/app/auth-context";
 import { iconSwap, iconSlot } from "@/styles/motion.css";
 import { NAV_ITEMS } from "./nav";
@@ -17,7 +17,6 @@ function titleFor(pathname: string): string {
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { theme, toggle } = useTheme();
   const { signOut } = useAuth();
   const { pathname } = useLocation();
 
@@ -65,20 +64,6 @@ export function AppShell() {
             </span>
           </button>
           <h1 className={styles.headerTitle}>{titleFor(pathname)}</h1>
-          <button
-            className={styles.iconButton}
-            onClick={toggle}
-            aria-label="Alternar tema"
-          >
-            <span className={iconSwap} data-state={theme === "light" ? "a" : "b"}>
-              <span className={iconSlot} data-icon="a">
-                <Icon name="moon" />
-              </span>
-              <span className={iconSlot} data-icon="b">
-                <Icon name="sun" />
-              </span>
-            </span>
-          </button>
           <button
             className={styles.iconButton}
             onClick={() => void signOut()}

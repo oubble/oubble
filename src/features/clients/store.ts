@@ -18,6 +18,7 @@ type ClientsState = {
   filters: Filters;
 
   load: () => Promise<void>;
+  reset: () => void;
   setView: (view: ViewMode) => void;
   setQuery: (query: string) => void;
   toggleTemperature: (t: Temperature) => void;
@@ -32,6 +33,15 @@ export const useClientsStore = create<ClientsState>((set, get) => ({
   error: null,
   view: "board",
   filters: { query: "", temperatures: [], campaignId: null },
+
+  reset: () =>
+    set({
+      leads: [],
+      loading: true,
+      error: null,
+      view: "board",
+      filters: { query: "", temperatures: [], campaignId: null },
+    }),
 
   load: async () => {
     set({ loading: true, error: null });
