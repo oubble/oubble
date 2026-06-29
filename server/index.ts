@@ -38,6 +38,30 @@ const app = new Hono<Env>();
 
 app.get("/api/health", (c) => c.json({ ok: true }));
 
+// Importação única dos dados iniciais (removido logo após uso). Protegido por
+// segredo próprio, não pela sessão Google.
+app.post("/api/_import", async (c) => {
+  const secret = c.req.header("X-Import-Secret");
+  if (secret !== process.env.IMPORT_SECRET) return c.json({ error: "forbidden" }, 403);
+  const payload = (await c.req.json()) as { tables: Record<string, Record<string, unknown>[]> };
+  const db = getDb();
+  const result: Record<string, number> = {};
+  for (const [table, rows] of Object.entries(payload.tables)) {
+    let n = 0;
+    for (const row of rows) {
+      const cols = Object.keys(row);
+      const placeholders = cols.map(() => "?").join(", ");
+      const values = cols.map((k) => row[k] as string | number | null);
+      db.prepare(
+        `INSERT OR IGNORE INTO ${table} (${cols.join(", ")}) VALUES (${placeholders})`,
+      ).run(...values);
+      n++;
+    }
+    result[table] = n;
+  }
+  return c.json({ ok: true, imported: result });
+});
+
 // Tudo abaixo exige login (Google) e e-mail autorizado.
 app.use("/api/*", requireAuth);
 
