@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { Icon } from "@/components/Icon";
-import { Logo } from "@/components/Logo";
+import { LogoMark } from "@/components/LogoMark";
 import { useTheme } from "@/app/theme-context";
 import { useAuth } from "@/app/auth-context";
 import { iconSwap, iconSlot } from "@/styles/motion.css";
@@ -29,7 +29,7 @@ export function AppShell() {
 
       <aside className={`${styles.sidebar} ${menuOpen ? styles.sidebarOpen : ""}`}>
         <div className={styles.brand}>
-          <Logo className={styles.brandLogo} />
+          <LogoMark className={styles.brandLogo} />
         </div>
 
         <nav className={styles.navList}>

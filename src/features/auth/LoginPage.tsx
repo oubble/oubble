@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Logo } from "@/components/Logo";
+import { LogoMark } from "@/components/LogoMark";
 import { useAuth } from "@/app/auth-context";
 import * as styles from "./LoginPage.css";
 
@@ -65,7 +65,7 @@ export function LoginPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <Logo className={styles.logo} />
+        <LogoMark className={styles.logo} />
         <div>
           <h1 className={styles.title}>Bem-vindo de volta</h1>
           <p className={styles.subtitle}>
@@ -88,7 +88,7 @@ export function NoAccessPage() {
   return (
     <div className={styles.page}>
       <div className={styles.card}>
-        <Logo className={styles.logo} />
+        <LogoMark className={styles.logo} />
         <div>
           <h1 className={styles.title}>Sem acesso</h1>
           <p className={styles.subtitle}>
