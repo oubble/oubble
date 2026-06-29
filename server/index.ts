@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { runScan } from "./services/engine.ts";
 import { getDb } from "./db/index.ts";
@@ -245,6 +246,14 @@ app.post("/api/scan", async (c) => {
     return c.json({ error: reason }, 502);
   }
 });
+
+// Em produção, o mesmo processo serve o front buildado (dist/) e cai no
+// index.html para as rotas do React Router. Em dev, o Vite cuida do front.
+if (process.env.NODE_ENV === "production") {
+  app.use("/assets/*", serveStatic({ root: "./dist" }));
+  app.use("/*", serveStatic({ root: "./dist" }));
+  app.get("/*", serveStatic({ path: "./dist/index.html" }));
+}
 
 const port = Number(process.env.PORT ?? 8787);
 serve({ fetch: app.fetch, port }, (info) => {
