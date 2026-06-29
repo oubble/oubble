@@ -1,0 +1,16 @@
+node_modules
+dist
+*.local
+
+# local database
+oubble.db
+oubble.db-wal
+oubble.db-shm
+
+# secrets
+.env
+
+# logs
+*.log
+
+.DS_Store
