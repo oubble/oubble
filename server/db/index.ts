@@ -52,27 +52,43 @@ export function migrateLegacyOwner(ownerId: string, db: DatabaseSync = getDb()):
     .get(LEGACY_OWNER_ID);
   if (!legacy && !legacySettings) return;
 
-  const tables = [
+  // Tabelas com owner_id não-único: migração direta por UPDATE.
+  const ownedTables = [
     "leads",
     "campaigns",
     "email_templates",
     "email_log",
     "design_briefs",
-    "settings",
   ];
-  const tx = db.prepare("BEGIN");
-  tx.run();
+  db.prepare("BEGIN").run();
   try {
-    for (const t of tables) {
+    for (const t of ownedTables) {
       db.prepare(`UPDATE ${t} SET owner_id = ? WHERE owner_id = ?`).run(
         ownerId,
         LEGACY_OWNER_ID,
       );
     }
+    // settings tem owner_id como PK única. Se o usuário já tem uma linha
+    // (criada no 1º login), removê-la antes de promover a legada — assim os
+    // ajustes antigos do dono prevalecem sem violar a unicidade.
+    db.prepare("DELETE FROM settings WHERE owner_id = ?").run(ownerId);
+    db.prepare("UPDATE settings SET owner_id = ? WHERE owner_id = ?").run(
+      ownerId,
+      LEGACY_OWNER_ID,
+    );
     db.prepare("COMMIT").run();
   } catch (e) {
     db.prepare("ROLLBACK").run();
-    throw e;
+    // Nunca deixar o login travado por causa da migração: limpa o legado
+    // remanescente para que a próxima requisição funcione normalmente.
+    for (const t of [...ownedTables, "settings"]) {
+      try {
+        db.prepare(`DELETE FROM ${t} WHERE owner_id = ?`).run(LEGACY_OWNER_ID);
+      } catch {
+        /* ignore */
+      }
+    }
+    console.error("migrateLegacyOwner failed, legacy cleared:", e);
   }
 }
 
